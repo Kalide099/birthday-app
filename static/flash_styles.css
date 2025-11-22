@@ -1,0 +1,40 @@
+
+/* Flash Messages */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    animation: slideDown 0.3s ease;
+}
+
+.alert i {
+    font-size: 18px;
+}
+
+.alert-error {
+    background: #fee;
+    color: #c33;
+    border-left: 4px solid #c33;
+}
+
+.alert-success {
+    background: #efe;
+    color: #3c3;
+    border-left: 4px solid #3c3;
+}
+
+.alert-warning {
+    background: #ffe;
+    color: #cc3;
+    border-left: 4px solid #cc3;
+}
+
+.alert-info {
+    background: #eef;
+    color: #33c;
+    border-left: 4px solid #33c;
+}
