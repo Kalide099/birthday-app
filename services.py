@@ -77,8 +77,11 @@ def send_password_reset_email(user, token):
         smtp_email = os.getenv('SMTP_EMAIL')
         smtp_password = os.getenv('SMTP_PASSWORD')
         
+        logger.info(f"Attempting to send password reset email to {user.email}")
+        logger.info(f"SMTP Config - Server: {smtp_server}, Port: {smtp_port}, Email: {smtp_email}, Password set: {bool(smtp_password)}")
+        
         if not smtp_email or not smtp_password:
-            logger.warning("Email credentials not configured")
+            logger.error("Email credentials not configured - SMTP_EMAIL or SMTP_PASSWORD missing")
             return False
         
         # Create reset URL using environment variable or default to localhost
@@ -127,15 +130,27 @@ def send_password_reset_email(user, token):
         msg.attach(MIMEText(html, 'html'))
         
         # Send email
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
+        logger.info(f"Connecting to SMTP server: {smtp_server}:{smtp_port}")
+        with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+            logger.info("Starting TLS...")
             server.starttls()
+            logger.info("Logging in to SMTP server...")
             server.login(smtp_email, smtp_password)
+            logger.info("Sending message...")
             server.send_message(msg)
         
-        logger.info(f"Password reset email sent to {user.email}")
+        logger.info(f"✅ Password reset email sent successfully to {user.email}")
         return True
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"❌ SMTP Authentication failed: {e}. Check your Gmail App Password!")
+        return False
+    except smtplib.SMTPException as e:
+        logger.error(f"❌ SMTP Error sending password reset email: {e}")
+        return False
     except Exception as e:
-        logger.error(f"Error sending password reset email to {user.email}: {e}")
+        logger.error(f"❌ Unexpected error sending password reset email to {user.email}: {type(e).__name__}: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 
